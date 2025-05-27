@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>URL Shortener</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      text-align: center;
+      background: white;
+      padding: 3rem 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      max-width: 600px;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+
+    input[type="url"] {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      transition: border 0.2s;
+    }
+
+    input[type="url"]:focus {
+      outline: none;
+      border-color: #007bff;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .shortened {
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    .shortened a {
+      color: #007bff;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>URL Shortener</h1>
+    <form method="POST" action="">
+      <input type="url" name="url" autofocus="autofocus" autocomplete="off" placeholder="Paste your long URL here..." required />
+      <button type="submit">Shorten</button>
+    </form>
+
+    {{if .ShortURL}}
+    <div class="shortened">
+      Your short link: <a href="{{.ShortURL}}">{{.ShortURL}}</a>
+      <img src="data:image/png;base64,{{.QRCode}}">
+    </div>
+    {{end}}
+  </div>
+</body>
+</html>
