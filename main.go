@@ -7,6 +7,8 @@ import (
 	"math/rand"
 	"net/http"
 	"strings"
+	"path/filepath"
+	"os"
 
 	qrcode "github.com/skip2/go-qrcode"
 )
@@ -15,12 +17,20 @@ var urlStore = make(map[string]string)
 
 const BASE_URL = "http://localhost:8009"
 
+func getExecutableDir() string {
+    exePath, err := os.Executable()
+    if err != nil {
+        log.Fatal(err)
+    }
+    return filepath.Dir(exePath)
+}
+
 func main() {
 	http.HandleFunc("/", handleForm)
 	http.HandleFunc("/r/", handleRedirect)
 
 	log.Println("Starting server on port 8009")
-	log.Fatal(http.ListenAndServe(":8009", nil))
+	log.Fatal(http.ListenAndServe("0.0.0.0:8009", nil))
 }
 
 type ShortenRequest struct {
@@ -44,7 +54,8 @@ func generateShortURL(length int) string {
 // }
 
 func handleForm(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("index.html"))
+	htmlPath := filepath.Join(getExecutableDir(), "index.html")
+	tmpl := template.Must(template.ParseFiles(htmlPath))
 
 	if r.Method == http.MethodGet {
 		tmpl.Execute(w, nil)
