@@ -7,7 +7,7 @@ permissions:
   packages: write
 
 env:
-  IMAGE: ghcr.io/${{ github.repository_owner }}/myapp
+  IMAGE: ghcr.io/${{ github.repository_owner }}/go-shortener
 
 jobs:
   docker:
