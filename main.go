@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	qrcode "github.com/skip2/go-qrcode"
@@ -60,7 +61,8 @@ func generateShortURL(length int) string {
 // }
 
 func handleForm(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("index.html"))
+	htmlPath := filepath.Join(getExecutableDir(), "index.html")
+	tmpl := template.Must(template.ParseFiles(htmlPath))
 
 	if r.Method == http.MethodGet {
 		tmpl.Execute(w, nil)
