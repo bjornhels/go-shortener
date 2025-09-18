@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"strings"
 
 	qrcode "github.com/skip2/go-qrcode"
@@ -13,14 +14,29 @@ import (
 
 var urlStore = make(map[string]string)
 
-const BASE_URL = "http://localhost:8009"
+func getBaseURL() string {
+	baseURL := os.Getenv("BASE_URL")
+	if baseURL == "" {
+		baseURL = "http://localhost"
+	}
+	return baseURL
+}
+
+func getPort() string {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "80"
+	}
+	return ":" + port
+}
 
 func main() {
 	http.HandleFunc("/", handleForm)
 	http.HandleFunc("/r/", handleRedirect)
 
-	log.Println("Starting server on port 8009")
-	log.Fatal(http.ListenAndServe(":8009", nil))
+	port := getPort()
+	log.Printf("Starting server on port %s", port)
+	log.Fatal(http.ListenAndServe(port, nil))
 }
 
 type ShortenRequest struct {
@@ -54,8 +70,9 @@ func handleForm(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		r.ParseForm()
 		shortenedCode := generateShortURL(6)
+		baseURL := getBaseURL()
 		var png []byte
-		png, err := qrcode.Encode(BASE_URL+"/r/"+shortenedCode, qrcode.Medium, 256)
+		png, err := qrcode.Encode(baseURL+"/r/"+shortenedCode, qrcode.Medium, 256)
 
 		if err != nil {
 			log.Println(err)
@@ -63,7 +80,7 @@ func handleForm(w http.ResponseWriter, r *http.Request) {
 
 		data := ShortenRequest{
 			OriginalURL: r.FormValue("url"),
-			ShortURL:    BASE_URL + "/r/" + shortenedCode,
+			ShortURL:    baseURL + "/r/" + shortenedCode,
 			QRCode:      base64.StdEncoding.EncodeToString(png),
 		}
 		urlStore[shortenedCode] = data.OriginalURL
