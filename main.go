@@ -9,11 +9,27 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	qrcode "github.com/skip2/go-qrcode"
 )
 
 var urlStore = make(map[string]string)
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
+func getExecutableDir() string {
+	exe, err := os.Executable()
+	if err != nil {
+		return "."
+	}
+	if resolved, err := filepath.EvalSymlinks(exe); err == nil {
+		exe = resolved
+	}
+	return filepath.Dir(exe)
+}
 
 func getBaseURL() string {
 	baseURL := os.Getenv("BASE_URL")
@@ -62,7 +78,11 @@ func generateShortURL(length int) string {
 
 func handleForm(w http.ResponseWriter, r *http.Request) {
 	htmlPath := filepath.Join(getExecutableDir(), "index.html")
-	tmpl := template.Must(template.ParseFiles(htmlPath))
+	tmpl, err := template.ParseFiles(htmlPath)
+	if err != nil {
+		http.Error(w, "template error: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	if r.Method == http.MethodGet {
 		tmpl.Execute(w, nil)
